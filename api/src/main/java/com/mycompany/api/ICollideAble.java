@@ -5,6 +5,6 @@ package com.mycompany.api;
  */
 public interface ICollideAble extends IEntity {
 
-    ICollisionAbility getCollisionAbility();
+    CollisionAbility getCollisionAbility();
 
 }

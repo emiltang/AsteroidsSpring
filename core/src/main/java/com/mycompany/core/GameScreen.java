@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mycompany.api.IAssetManager;
 import com.mycompany.api.IProcessor;
 import com.mycompany.api.IWorld;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mycompany.api.PositionAbility;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -33,16 +33,17 @@ import static com.badlogic.gdx.math.MathUtils.radDeg;
 @Service
 public class GameScreen implements ApplicationListener {
 
-    private List<IProcessor> processors;
-    private IAssetManager assetManager;
+    private final List<IProcessor> processors;
+    private final IAssetManager assetManager;
+    private final IWorld world;
+    private final Viewport viewport = new FitViewport(IWorld.WIDTH, IWorld.HEIGHT);
+    private final Map<String, Texture> assets = new HashMap<>();
 
-    private IWorld world;
     private SpriteBatch batch;
-    private Viewport viewport;
-    private Map<String, Texture> assets = new HashMap<>();
 
-    @Autowired
-    public void setWorld(IWorld world) {
+    public GameScreen(List<IProcessor> processors, IAssetManager assetManager, IWorld world) {
+        this.processors = processors;
+        this.assetManager = assetManager;
         this.world = world;
     }
 
@@ -56,7 +57,6 @@ public class GameScreen implements ApplicationListener {
 
     @Override
     public void create() {
-        viewport = new FitViewport(IWorld.WIDTH, IWorld.HEIGHT);
         batch = new SpriteBatch();
 
         try (InputStream stream = getClass().getClassLoader().getResourceAsStream("bg5.jpg")) {
@@ -87,14 +87,15 @@ public class GameScreen implements ApplicationListener {
         batch.draw(assets.get("bg"), 0, 0, IWorld.WIDTH, IWorld.HEIGHT);
         world.getEntities().forEach(entity -> {
             Texture texture = assets.get(entity.getAsset());
+            PositionAbility position = entity.getPositionAbility();
             if (texture == null) return;
             batch.draw(
                     texture,
-                    entity.getX() - texture.getWidth() / 2, entity.getY() - texture.getHeight() / 2,
+                    position.getX() - texture.getWidth() / 2, position.getY() - texture.getHeight() / 2,
                     texture.getWidth() / 2, texture.getHeight() / 2,
                     texture.getWidth(), texture.getHeight(),
                     1, 1,
-                    entity.getRotation() * radDeg,
+                    position.getRotation() * radDeg,
                     0, 0,
                     texture.getWidth(), texture.getHeight(),
                     false, false
@@ -114,16 +115,6 @@ public class GameScreen implements ApplicationListener {
     @Override
     public void dispose() {
         batch.dispose();
-    }
-
-    @Autowired
-    public void setProcessors(List<IProcessor> processors) {
-        this.processors = processors;
-    }
-
-    @Autowired
-    public void setAssetManager(IAssetManager assetManager) {
-        this.assetManager = assetManager;
     }
 
 }

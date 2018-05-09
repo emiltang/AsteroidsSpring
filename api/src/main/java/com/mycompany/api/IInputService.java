@@ -14,7 +14,8 @@ public interface IInputService {
     enum Key {
         LEFT,
         RIGHT,
-        UP
+        UP,
+        SPACE
     }
 
 }

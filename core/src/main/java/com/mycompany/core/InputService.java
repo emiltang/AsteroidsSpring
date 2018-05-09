@@ -17,6 +17,8 @@ public class InputService implements IInputService {
                 return Gdx.input.isKeyPressed(Input.Keys.LEFT);
             case UP:
                 return Gdx.input.isKeyPressed(Input.Keys.UP);
+            case SPACE:
+                return Gdx.input.isKeyPressed(Input.Keys.SPACE);
             default:
                 return false;
         }

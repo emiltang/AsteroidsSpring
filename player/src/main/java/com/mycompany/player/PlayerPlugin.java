@@ -7,27 +7,21 @@
  */
 package com.mycompany.player;
 
-import com.mycompany.api.IAssetManager;
-import com.mycompany.api.ICollisionAbility;
-import com.mycompany.api.IMoveAbility;
-import com.mycompany.api.IWorld;
-import com.mycompany.library.CollisionAbility;
-import com.mycompany.library.MoveAbility;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mycompany.api.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.random;
+import static com.mycompany.api.IInputService.Key;
+import static java.lang.Math.*;
 
 /**
  * @author Emil
  */
 @Service
-public class PlayerPlugin {
+public class PlayerPlugin implements IProcessor {
 
     private static final String ASSET_KEY = "player";
     private static final String ASSET_PATH = "spaceship.png";
@@ -39,18 +33,30 @@ public class PlayerPlugin {
     private static final int DAMAGE = 0;
     private static final int HIT_RADIUS = 100;
 
-    private IAssetManager assetManager;
-    private IWorld world;
+    private final IAssetManager assetManager;
+    private final IWorld world;
+    private final IInputService inputService;
+    private final IProjectileService projectileService;
+
+    public PlayerPlugin(final IAssetManager assetManager,
+                        final IWorld world,
+                        final IInputService inputService,
+                        final IProjectileService projectileService) {
+        this.assetManager = assetManager;
+        this.world = world;
+        this.inputService = inputService;
+        this.projectileService = projectileService;
+    }
 
     @PostConstruct
     public void start() {
-        IMoveAbility moveAbility = new MoveAbility(ACCELERATION, DECELERATION, MAX_SPEED, ROTATION_SPEED);
-        ICollisionAbility collisionAbility = new CollisionAbility(DAMAGE, HIT_RADIUS);
-        Player player = new Player(ASSET_KEY, HEALTH_POINTS, moveAbility, collisionAbility);
+        PositionAbility positionAbility = new PositionAbility(IWorld.WIDTH / 2, IWorld.HEIGHT / 2, (float) (random() * 2 * PI));
+        MoveAbility moveAbility = new MoveAbility(ACCELERATION, DECELERATION, MAX_SPEED, ROTATION_SPEED);
+        CollisionAbility collisionAbility = new CollisionAbility(DAMAGE, HIT_RADIUS);
+        LifeAbility lifeAbility = new LifeAbility(HEALTH_POINTS);
 
-        player.setX(IWorld.WIDTH / 2);
-        player.setY(IWorld.HEIGHT / 2);
-        player.setRotation((float) (random() * 2 * PI));
+        Player player = new Player(ASSET_KEY, lifeAbility, moveAbility, collisionAbility, positionAbility);
+
         world.addEntity(player);
 
         try (InputStream stream = getClass().getClassLoader().getResourceAsStream(ASSET_PATH)) {
@@ -60,13 +66,33 @@ public class PlayerPlugin {
         }
     }
 
-    @Autowired
-    public void setAssetManager(IAssetManager assetManager) {
-        this.assetManager = assetManager;
+    @Override
+    public void process(final float dt) {
+        for (Player player : world.getEntities(Player.class)) {
+
+            MoveAbility move = player.getMoveAbility();
+            PositionAbility position = player.getPositionAbility();
+            CollisionAbility collision = player.getCollisionAbility();
+            LifeAbility life = player.getLifeAbility();
+
+            move.setMoveForward(inputService.keyDown(Key.UP));
+            move.setTurnLeft(inputService.keyDown(Key.LEFT));
+            move.setTurnRight(inputService.keyDown(Key.RIGHT));
+
+            collision.getCollisions().stream()
+                    .map(ICollideAble::getCollisionAbility)
+                    .map(CollisionAbility::getDamage)
+                    .forEach(life::reduceHealthPoints);
+
+            if (life.getHealthPoints() <= 0)
+                world.removeEntity(player);
+
+            if (inputService.keyDown(Key.SPACE)) {
+                world.addEntity(projectileService.createProjectile(position.getRotation(),
+                        (float) (cos(position.getRotation()) * 150 + position.getX()),
+                        (float) (sin(position.getRotation()) * 150 + position.getY())));
+            }
+        }
     }
 
-    @Autowired
-    public void setWorld(IWorld world) {
-        this.world = world;
-    }
 }

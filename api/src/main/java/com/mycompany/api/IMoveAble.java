@@ -5,6 +5,6 @@ package com.mycompany.api;
  */
 public interface IMoveAble extends IEntity {
 
-    IMoveAbility getMoveAbility();
+    MoveAbility getMoveAbility();
 
 }

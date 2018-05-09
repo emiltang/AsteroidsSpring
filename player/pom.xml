@@ -9,20 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>player</artifactId>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>com.mycompany</groupId>
             <artifactId>api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mycompany</groupId>
-            <artifactId>library</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

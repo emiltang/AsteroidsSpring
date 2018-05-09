@@ -1,8 +1,6 @@
-package com.mycompany.library;
+package com.mycompany.api;
 
-import com.mycompany.api.IMoveAbility;
-
-public class MoveAbility implements IMoveAbility {
+public class MoveAbility {
 
     private final float acceleration;
     private final float deceleration;
@@ -81,12 +79,10 @@ public class MoveAbility implements IMoveAbility {
         this.moveForward = moveForward;
     }
 
-    @Override
     public void translateDx(float dx) {
         this.dx += dx;
     }
 
-    @Override
     public void translateDy(float dy) {
         this.dy += dy;
     }

@@ -7,14 +7,21 @@
     <artifactId>asteroids-spring</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
     <modules>
         <module>core</module>
         <module>api</module>
         <module>player</module>
-        <module>library</module>
         <module>world</module>
         <module>move</module>
         <module>application</module>
+        <module>asteroids</module>
+        <module>projectile</module>
+        <module>collision</module>
     </modules>
     <dependencies>
         <dependency>

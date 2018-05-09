@@ -15,22 +15,21 @@ import com.mycompany.api.*;
 public class Player implements IMoveAble, IEntity, ICollideAble {
 
     private final String asset;
-    private final IMoveAbility moveAbility;
-    private final ICollisionAbility collisionAbility;
-
-    private float x;
-    private float y;
-    private float rotation;
-    private int healthPoints;
+    private final MoveAbility moveAbility;
+    private final CollisionAbility collisionAbility;
+    private final LifeAbility lifeAbility;
+    private final PositionAbility positionAbility;
 
     Player(final String asset,
-           final int healthPoints,
-           final IMoveAbility moveAbility,
-           final ICollisionAbility collisionAbility) {
+           final LifeAbility lifeAbility,
+           final MoveAbility moveAbility,
+           final CollisionAbility collisionAbility,
+           final PositionAbility positionAbility) {
         this.asset = asset;
-        this.healthPoints = healthPoints;
+        this.lifeAbility = lifeAbility;
         this.moveAbility = moveAbility;
         this.collisionAbility = collisionAbility;
+        this.positionAbility = positionAbility;
     }
 
     @Override
@@ -39,74 +38,20 @@ public class Player implements IMoveAble, IEntity, ICollideAble {
     }
 
     @Override
-    public float getX() {
-        return x;
-    }
-
-    @Override
-    public void setX(float x) {
-        this.x = x;
-    }
-
-    @Override
-    public float getY() {
-        return y;
-    }
-
-    @Override
-    public void setY(float y) {
-        this.y = y;
-    }
-
-    @Override
-    public float getRotation() {
-        return rotation;
-    }
-
-    @Override
-    public void setRotation(float rotation) {
-        this.rotation = rotation;
-    }
-
-    @Override
-    public void addRotation(float rotation) {
-        this.rotation += rotation;
-    }
-
-    @Override
-    public void subtractRotation(float rotation) {
-        this.rotation -= rotation;
-    }
-
-    @Override
-    public void translateX(float x) {
-        this.x += x;
-    }
-
-    @Override
-    public void translateY(float y) {
-        this.y += y;
-    }
-
-    int getHealthPoints() {
-        return healthPoints;
-    }
-
-    void setHealthPoints(int healthPoints) {
-        this.healthPoints = healthPoints;
-    }
-
-    void reduceHealthPoints(int healthPoints) {
-        this.healthPoints -= healthPoints;
-    }
-
-    @Override
-    public IMoveAbility getMoveAbility() {
+    public MoveAbility getMoveAbility() {
         return moveAbility;
     }
 
     @Override
-    public ICollisionAbility getCollisionAbility() {
+    public CollisionAbility getCollisionAbility() {
         return collisionAbility;
+    }
+
+    public LifeAbility getLifeAbility() {
+        return lifeAbility;
+    }
+
+    public PositionAbility getPositionAbility() {
+        return positionAbility;
     }
 }

@@ -1,14 +1,11 @@
-package com.mycompany.library;
-
-import com.mycompany.api.ICollideAble;
-import com.mycompany.api.ICollisionAbility;
+package com.mycompany.api;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 
-public class CollisionAbility implements ICollisionAbility {
+public class CollisionAbility  {
 
     private final Set<ICollideAble> collisions = new HashSet<>();
     private final int damage;

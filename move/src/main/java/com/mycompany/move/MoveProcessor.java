@@ -1,10 +1,6 @@
 package com.mycompany.move;
 
-import com.mycompany.api.IMoveAbility;
-import com.mycompany.api.IMoveAble;
-import com.mycompany.api.IProcessor;
-import com.mycompany.api.IWorld;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mycompany.api.*;
 import org.springframework.stereotype.Service;
 
 import static java.lang.Math.*;
@@ -15,54 +11,53 @@ import static java.lang.Math.*;
 @Service
 public class MoveProcessor implements IProcessor {
 
-    private IWorld world;
+    private final IWorld world;
+
+    public MoveProcessor(IWorld world) {
+        this.world = world;
+    }
 
     @Override
     public void process(float deltaTime) {
         for (IMoveAble moveAble : world.getEntities(IMoveAble.class)) {
 
-            IMoveAbility moveAbility = moveAble.getMoveAbility();
+            MoveAbility move = moveAble.getMoveAbility();
+            PositionAbility position = moveAble.getPositionAbility();
 
             // TL;DR: stuff moves
-            if (moveAbility.isTurnLeft())
-                moveAble.addRotation(moveAbility.getRotationSpeed() * deltaTime);
+            if (move.isTurnLeft())
+                position.addRotation(move.getRotationSpeed() * deltaTime);
 
-            if (moveAbility.isTurnRight())
-                moveAble.subtractRotation(moveAbility.getRotationSpeed() * deltaTime);
+            if (move.isTurnRight())
+                position.subtractRotation(move.getRotationSpeed() * deltaTime);
 
-            if (moveAbility.isMoveForward()) {
-                moveAbility.translateDx((float) (cos(moveAble.getRotation()) * moveAbility.getAcceleration() * deltaTime));
-                moveAbility.translateDy((float) (sin(moveAble.getRotation()) * moveAbility.getAcceleration() * deltaTime));
+            if (move.isMoveForward()) {
+                move.translateDx((float) (cos(position.getRotation()) * move.getAcceleration() * deltaTime));
+                move.translateDy((float) (sin(position.getRotation()) * move.getAcceleration() * deltaTime));
             }
-            float velocity = (float) sqrt(moveAbility.getDx() * moveAbility.getDx() + moveAbility.getDy() * moveAbility.getDy());
+            float velocity = (float) sqrt(move.getDx() * move.getDx() + move.getDy() * move.getDy());
             if (velocity > 0) {
-                moveAbility.translateDx(-(moveAbility.getDx() / velocity) * moveAbility.getDeceleration() * deltaTime);
-                moveAbility.translateDy(-(moveAbility.getDy() / velocity) * moveAbility.getDeceleration() * deltaTime);
+                move.translateDx(-(move.getDx() / velocity) * move.getDeceleration() * deltaTime);
+                move.translateDy(-(move.getDy() / velocity) * move.getDeceleration() * deltaTime);
             }
-            if (velocity > moveAbility.getMaxSpeed()) {
-                moveAbility.setDx((moveAbility.getDx() / velocity) * moveAbility.getMaxSpeed());
-                moveAbility.setDy((moveAbility.getDy() / velocity) * moveAbility.getMaxSpeed());
-            }
-
-            moveAble.translateX(moveAbility.getDx() * deltaTime);
-            if (moveAble.getX() > IWorld.WIDTH) {
-                moveAble.setX(0);
-            } else if (moveAble.getX() < 0) {
-                moveAble.setX(IWorld.WIDTH);
+            if (velocity > move.getMaxSpeed()) {
+                move.setDx((move.getDx() / velocity) * move.getMaxSpeed());
+                move.setDy((move.getDy() / velocity) * move.getMaxSpeed());
             }
 
-            moveAble.translateY(moveAbility.getDy() * deltaTime);
-            if (moveAble.getY() > IWorld.HEIGHT) {
-                moveAble.setY(0);
-            } else if (moveAble.getY() < 0) {
-                moveAble.setY(IWorld.HEIGHT);
+            position.translateX(move.getDx() * deltaTime);
+            if (position.getX() > IWorld.WIDTH) {
+                position.setX(0);
+            } else if (position.getX() < 0) {
+                position.setX(IWorld.WIDTH);
+            }
+
+            position.translateY(move.getDy() * deltaTime);
+            if (position.getY() > IWorld.HEIGHT) {
+                position.setY(0);
+            } else if (position.getY() < 0) {
+                position.setY(IWorld.HEIGHT);
             }
         }
     }
-
-    @Autowired
-    public void setWorld(IWorld world) {
-        this.world = world;
-    }
-
 }
